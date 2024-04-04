@@ -15,7 +15,7 @@ class Application {
 
     public Application (){
         for (int i = 0; i < 10; i++) {
-            contacts[i] = new Contact("", "");
+            contacts[i] = new Contact("~", "~");
         }
     }
     public void run() {
@@ -56,19 +56,24 @@ class Application {
     private void DeleteContact() {
         command = 3;
         System.out.print("Введите индекс контакта: ");
-        int index_delete = sc.nextInt();
-        contacts[index_delete].SetContact("", "");
+        int index_delete = GetIndex() - 1;
+        if (index_delete == -2){
+            System.out.println("Введён несуществующий индекс");
+            return;
+        }
+        contacts[index_delete].SetContact("~", "~");
         for (int i = index_delete; i < 9; i++){
             contacts[i] = contacts[i + 1];
         }
-        contacts[9] = new Contact("", "");
+        contacts[9].SetContact("~", "~");
         index--;
+        System.out.println("Контакт успешно удалён");
     }
 
     private void AddContact () {
         command = 1;
         if (index == 10) {
-            System.out.print("Вы достигли предела контактов");
+            System.out.print("Вы достигли предела кол-ва контактов");
             return;
         }
         System.out.print("Введите имя и номер контакта через пробел: ");
@@ -80,12 +85,17 @@ class Application {
 
     private void ChangeContact () {
         command = 2;
-        System.out.print("Введите команду:\nРедактировать\nПоменять местами\n> ");
+        System.out.print("Введите команду:\n1. Редактировать\n2. Поменять местами\n> ");
         String comm = sc.nextLine();
         switch (comm) {
+            case "1":
             case "Редактировать":
                 System.out.print("Введите индекс контакта: ");
-                int index_change = sc.nextInt() - 1;
+                int index_change = GetIndex() - 1;
+                if (index_change == -2){
+                    System.out.println("Введён несуществующий индекс");
+                    return;
+                }
                 System.out.print("Хотите изменить имя, номер и всё\n('1. Имя', '2. Номер', '3. Всё')\n> ");
                 String in = sc.next();
                 name = contacts[index_change].GetContact()[0];
@@ -113,15 +123,21 @@ class Application {
                 }
                 contacts[index_change].SetContact(name, number);
                 break;
+            case "2":
             case "Поменять местами":
                 System.out.print("Введите индексы контактов, которые хотите поменять, через пробел:  ");
-                int index_f = sc.nextInt();
-                int index_s = sc.nextInt();
+                int index_f = GetIndex() - 1;
+                int index_s = GetIndex() - 1;
+                if ((index_f == -2) || (index_s == -2)){
+                    System.out.println("Введён несуществующий индекс");
+                    return;
+                }
                 Contact swap = contacts[index_s];
                 contacts[index_s] = contacts[index_f];
                 contacts[index_f] = swap;
                 break;
             default:
+                System.out.print("\nВведена несуществующая функция");
                 break;
         }
     }
@@ -137,10 +153,18 @@ class Application {
         }
         System.out.println("-----------------------------------");
     }
+
+    private int GetIndex() {
+        int check_index = sc.nextInt();
+        if ((0 < check_index) && (check_index < index + 1)) {
+            return check_index;
+        }
+        return -1;
+    }
 }
 class Contact {
-    private String name = "";
-    private String number = "";
+    private String name = "~";
+    private String number = "~";
     public Contact (String name, String number) {
         this.name = name;
         this.number = number;
